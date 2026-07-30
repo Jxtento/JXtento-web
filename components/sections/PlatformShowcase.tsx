@@ -26,7 +26,7 @@ export function PlatformShowcase() {
       `}</style>
 
       {/* Header label */}
-      <p className="font-mono text-[10px] tracking-[.18em] uppercase text-[var(--muted)] mb-8 text-center md:text-left">
+      <p className="font-mono text-[10px] tracking-[.18em] uppercase text-[var(--muted)] mb-8 text-center md:text-left" style={{ textShadow: '0 0 4px #fff, 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff' }}>
         Scan anywhere you trade
       </p>
 
@@ -80,7 +80,7 @@ export function PlatformShowcase() {
       </div>
 
       {/* Footer note */}
-      <p className="font-mono text-[9.5px] tracking-[.1em] uppercase text-[var(--muted)] mt-10 text-center md:text-left">
+      <p className="font-mono text-[9.5px] tracking-[.1em] uppercase text-[var(--muted)] mt-10 text-center md:text-left" style={{ textShadow: '0 0 4px #fff, 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff' }}>
         No wallet connection required — read-only intelligence
       </p>
     </div>
