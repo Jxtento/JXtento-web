@@ -5,6 +5,9 @@ import { GuardedTab } from '@/components/terminal/GuardedTab';
 import { CopilotTab } from '@/components/terminal/CopilotTab';
 import { KolLiveFeed } from '@/components/terminal/KolLiveFeed';
 import { NewsLiveFeed } from '@/components/terminal/NewsLiveFeed';
+import { ActivityLog } from '@/components/terminal/ActivityLog';
+import { LaunchRadarTab } from '@/components/terminal/LaunchRadarTab';
+import { AxiomProTab } from '@/components/terminal/AxiomProTab';
 
 export default function TerminalPage() {
   const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("kol");
@@ -82,6 +85,12 @@ export default function TerminalPage() {
               <KolLiveFeed />
             ) : activeTab === 'news' ? (
               <NewsLiveFeed />
+            ) : activeTab === 'activity' ? (
+              <ActivityLog />
+            ) : activeTab === 'radar' ? (
+              <LaunchRadarTab />
+            ) : activeTab === 'axiom' ? (
+              <AxiomProTab />
             ) : (
               <div className="p-6 text-center mt-8 border border-axiom-border border-dashed rounded-lg">
                 <span className="text-4xl mb-4 block">🚧</span>
