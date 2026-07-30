@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/Button";
-import { MapCanvas } from "./MapCanvas";
+import { PlatformShowcase } from "./PlatformShowcase";
+import { AddressBackground } from "@/components/ui/AddressBackground";
 
 export function Hero() {
   return (
-    <header className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 md:py-[72px] pb-[60px] md:pb-[84px] grid grid-cols-1 md:grid-cols-[1.05fr_1fr] gap-10 md:gap-[56px] items-center">
-      <div>
+    <div className="relative w-full overflow-hidden">
+      <AddressBackground />
+      
+      <header className="relative z-10 w-full max-w-[1200px] mx-auto px-4 md:px-[32px] pt-[80px] pb-[60px] md:pt-[120px] md:pb-[100px] grid grid-cols-1 md:grid-cols-[1fr_minmax(340px,460px)] gap-12 md:gap-[80px] items-center">
+        <div className="flex flex-col justify-center">
         <span className="font-mono text-[11px] font-medium tracking-[.22em] uppercase text-[var(--muted)]">
           Solana trade intelligence
         </span>
@@ -16,27 +20,30 @@ export function Hero() {
         </p>
         <div className="flex gap-[14px] flex-wrap mb-[40px]">
           <Button href="#" size="lg">Launch terminal</Button>
-          <Button href="#map" variant="ghost" size="lg">How it reads the chain</Button>
+          <div className="bg-[rgba(251,250,247,0.95)] backdrop-blur-sm relative z-10">
+            <Button href="#map" variant="ghost" size="lg">How it reads the chain</Button>
+          </div>
         </div>
-        <div className="flex gap-0 border-t border-[var(--line)]">
-          <div className="flex-1 py-4 border-r border-[var(--line)]">
+        <div className="grid grid-cols-3 border border-[var(--line)] bg-[rgba(251,250,247,0.95)] backdrop-blur-sm shadow-sm relative z-10">
+          <div className="py-4 px-4 border-r border-[var(--line)]">
             <b className="block font-mono text-[19px] font-semibold tracking-[-.01em]">{"<400ms"}</b>
             <span className="font-mono text-[10px] tracking-[.14em] uppercase text-[var(--muted)]">Funding trace</span>
           </div>
-          <div className="flex-1 py-4 border-r border-[var(--line)] pl-4 md:pl-[24px]">
+          <div className="py-4 px-4 border-r border-[var(--line)]">
             <b className="block font-mono text-[19px] font-semibold tracking-[-.01em]">Genesis</b>
             <span className="font-mono text-[10px] tracking-[.14em] uppercase text-[var(--muted)]">Full chain index</span>
           </div>
-          <div className="flex-1 py-4 pl-4 md:pl-[24px]">
+          <div className="py-4 px-4">
             <b className="block font-mono text-[19px] font-semibold tracking-[-.01em]">0</b>
             <span className="font-mono text-[10px] tracking-[.14em] uppercase text-[var(--muted)]">Wallet connect</span>
           </div>
         </div>
       </div>
 
-      <div className="relative aspect-[1/1.02] overflow-hidden w-full max-w-[460px] md:max-w-none mx-auto md:mx-0">
-        <MapCanvas />
-      </div>
-    </header>
+        <div className="relative aspect-[1/1.02] overflow-hidden w-full max-w-[460px] md:max-w-none mx-auto md:mx-0">
+          <PlatformShowcase />
+        </div>
+      </header>
+    </div>
   );
 }

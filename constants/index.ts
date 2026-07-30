@@ -89,3 +89,4 @@ export const TOKEN_DETAILS: TokenDetails = {
 
 export const TICKERS = ["BONK", "WIF", "POPCAT", "MEW", "MOODENG", "PNUT", "GOAT", "FWOG", "GIGA", "RETARDIO", "PONKE", "MICHI"];
 export const FLAGS = ["dev funded", "bundle 34%", "smart in", "new pair", "LP locked", "rug flag", "trace ok"];
+
