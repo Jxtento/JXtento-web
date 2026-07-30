@@ -34,19 +34,8 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="relative border border-[var(--line-strong)] map-panel-bg aspect-[1/1.02] overflow-hidden w-full max-w-[460px] md:max-w-none mx-auto md:mx-0">
-        <div className="absolute top-0 left-0 right-0 z-[3] flex justify-between items-center py-[12px] px-[14px] font-mono text-[10.5px] tracking-[.12em] uppercase text-[var(--muted)] border-b border-[var(--line)] bg-[rgba(251,250,247,.72)]">
-          <span>funding_graph.live</span>
-          <span className="inline-flex items-center gap-[7px] text-[var(--ink)] before:content-[''] before:w-[6px] before:h-[6px] before:rounded-full before:bg-[var(--accent)] before:animate-[pulse_1.6s_ease-in-out_infinite]">
-            tracing
-          </span>
-        </div>
+      <div className="relative aspect-[1/1.02] overflow-hidden w-full max-w-[460px] md:max-w-none mx-auto md:mx-0">
         <MapCanvas />
-        <div className="absolute left-[14px] bottom-[12px] z-[3] flex gap-4 font-mono text-[10px] tracking-[.06em] text-[var(--muted)]">
-          <span className="flex items-center"><i className="w-[9px] h-[9px] inline-block mr-[6px] rounded-full align-middle bg-transparent border-[1.5px] border-[var(--accent)] not-italic"></i>Dev / rugger</span>
-          <span className="flex items-center"><i className="w-[9px] h-[9px] inline-block mr-[6px] rounded-full align-middle bg-[var(--ink)] not-italic"></i>Smart money</span>
-          <span className="flex items-center"><i className="w-[9px] h-[9px] inline-block mr-[6px] rounded-full align-middle bg-transparent border-[1.5px] border-[#B7B1A6] not-italic"></i>Wallet</span>
-        </div>
       </div>
     </header>
   );
