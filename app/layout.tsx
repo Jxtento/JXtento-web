@@ -35,7 +35,10 @@ export default function RootLayout({
       lang="en"
       className={`${dmSerif.variable} ${plexMono.variable} ${instrumentSans.variable} scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-[var(--paper)] text-[var(--ink)] antialiased overflow-x-hidden">
+      <body 
+        className="min-h-full flex flex-col font-sans bg-[var(--paper)] text-[var(--ink)] antialiased overflow-x-hidden"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

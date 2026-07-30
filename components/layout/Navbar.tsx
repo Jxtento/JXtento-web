@@ -24,7 +24,7 @@ export function Navbar() {
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
               SOL Access
             </span>
-            <Button href="#">Launch terminal</Button>
+            <Button href="/terminal">Launch terminal</Button>
           </div>
         </div>
       </div>
