@@ -22,7 +22,7 @@ export function Navbar() {
           <div className="flex items-center gap-4">
             <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 text-[10px] font-mono tracking-widest uppercase rounded-full border border-green-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-              SOL + RBC Access
+              SOL Access
             </span>
             <Button href="#">Launch terminal</Button>
           </div>
