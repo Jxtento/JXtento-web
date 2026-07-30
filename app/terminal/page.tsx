@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { GuardedTab } from '@/components/terminal/GuardedTab';
 import { CopilotTab } from '@/components/terminal/CopilotTab';
 import { KolLiveFeed } from '@/components/terminal/KolLiveFeed';
@@ -19,14 +20,23 @@ export default function TerminalPage() {
         <main className="w-full h-full bg-axiom-bg flex flex-col overflow-hidden text-axiom-text">
           
           {/* Header */}
-          <div className="flex items-center gap-2 p-4 border-b border-axiom-border bg-axiom-panel">
-            <div className="w-8 h-8 rounded bg-axiom-accent/20 flex items-center justify-center text-axiom-accent font-bold">
-              AX
+          <div className="flex items-center justify-between p-4 border-b border-axiom-border bg-axiom-panel">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded bg-axiom-accent/20 flex items-center justify-center text-axiom-accent font-bold">
+                AX
+              </div>
+              <div>
+                <h1 className="font-bold leading-tight">JXtento Pro</h1>
+                <p className="text-xs text-axiom-muted">Solana Intelligence</p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-bold leading-tight">JXtento Pro</h1>
-              <p className="text-xs text-axiom-muted">Solana Intelligence</p>
-            </div>
+            <Link 
+              href="/" 
+              className="px-3 py-1.5 text-xs font-semibold rounded bg-axiom-bg border border-axiom-border text-axiom-muted hover:text-axiom-text hover:border-axiom-text transition-colors flex items-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Home
+            </Link>
           </div>
 
           {/* Tabs */}
