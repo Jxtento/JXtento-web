@@ -12,6 +12,16 @@ export function NewsLiveFeed() {
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8080").replace(/\/$/, "");
     const WS_URL = apiUrl.replace("http://", "ws://").replace("https://", "wss://") + "/ws/kol-alerts";
 
+    // Fetch initial historical news data
+    fetch(`${apiUrl}/v1/kol-events?category=news`)
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted && Array.isArray(data)) {
+          setEvents(data);
+        }
+      })
+      .catch(err => console.error("Failed to fetch News events", err));
+
     function connect() {
       if (!isMounted) return;
       ws = new WebSocket(WS_URL);

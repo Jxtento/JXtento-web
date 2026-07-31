@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-const getWalletStatus = async (): Promise<{ connected?: boolean; publicKey?: string }> => ({ connected: true, publicKey: "web-wallet-placeholder" });
+const getWalletStatus = async (): Promise<{ connected?: boolean; publicKey?: string }> => {
+  try {
+    const { solana } = window as any;
+    if (solana && solana.isPhantom && solana.isConnected) {
+      return { connected: true, publicKey: solana.publicKey.toString() };
+    }
+  } catch (e) {}
+  return { connected: false };
+};
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8080").replace(/\/+$/, "");
 
 export function GuardToggleButton({ mint }: { mint: string }) {
@@ -32,13 +40,28 @@ export function GuardToggleButton({ mint }: { mint: string }) {
   }, [mint]);
 
   const toggleGuard = async () => {
-    if (!wallet) return alert("Please connect your wallet first.");
+    let currentWallet = wallet;
+    if (!currentWallet) {
+      try {
+        const { solana } = window as any;
+        if (solana && solana.isPhantom) {
+          await solana.connect();
+          currentWallet = solana.publicKey.toString();
+          setWallet(currentWallet);
+        } else {
+          return alert("Please install Phantom wallet first.");
+        }
+      } catch (e) {
+        return alert("Please connect your Phantom wallet to enable guard.");
+      }
+    }
+    
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/v1/guard/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet, mint, enabled: !isGuarded })
+        body: JSON.stringify({ wallet: currentWallet, mint, enabled: !isGuarded })
       });
       const data = await res.json();
       if (data.success) {

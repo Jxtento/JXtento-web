@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { GuardedTab } from '@/components/terminal/GuardedTab';
 import { CopilotTab } from '@/components/terminal/CopilotTab';
 import { KolLiveFeed } from '@/components/terminal/KolLiveFeed';
@@ -21,9 +22,9 @@ export default function TerminalPage() {
           
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-axiom-border bg-axiom-panel">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-axiom-accent/20 flex items-center justify-center text-axiom-accent font-bold">
-                AX
+            <div className="flex items-center gap-3">
+              <div className="relative w-8 h-8 flex-shrink-0">
+                <Image src="/logo-jxtento.png" alt="JXtento Logo" fill className="object-contain" />
               </div>
               <div>
                 <h1 className="font-bold leading-tight">JXtento Pro</h1>
