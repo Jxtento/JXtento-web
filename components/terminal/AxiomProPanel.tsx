@@ -4,6 +4,7 @@ import { TokenRiskPanel } from "./TokenRiskPanel"
 export type TokenIntelligence = any;
 export type AxiomTokenContext = any;
 import { GuardToggleButton } from "./GuardToggleButton"
+import { LiveVolumeChart } from "./LiveVolumeChart"
 
 type SmartMoneyEvent = {
   action: string
@@ -34,6 +35,7 @@ export function AxiomProPanel({ mintAddress, context }: { mintAddress: string, c
           
           if (active) {
             setIntel({
+              ...data,
               address: mintAddress,
               type: "token",
               source: "live",
@@ -44,10 +46,10 @@ export function AxiomProPanel({ mintAddress, context }: { mintAddress: string, c
                 level: data.level,
                 label: data.level === "high" ? "Risky" : data.level === "medium" ? "Watch" : "Clean"
               },
-              holderRisk: `Top 10: ${data.details?.top10Concentration}%`,
+              holderRisk: data.details?.top10Concentration ? `Top 10: ${data.details.top10Concentration}%` : "Unknown",
               freshWalletActivity: data.details?.freshWalletActivity || "Unknown",
               whaleActivity: data.details?.whaleActivity || "Unknown",
-              summary: data.warnings?.join(" ") || "Token appears clean. Authority revoked and routes clear.",
+              summary: data.warnings?.length ? data.warnings.join(" ") : "Token appears clean. Authority revoked and routes clear.",
               recentActivity: []
             })
           }
@@ -105,7 +107,6 @@ export function AxiomProPanel({ mintAddress, context }: { mintAddress: string, c
       {/* Deployer Intel */}
       <DeveloperReputationPanel tokenAddress={mintAddress} context={context} />
       
-      {/* Rug Scan Component */}
       <div className="rounded-sm border border-axiom-border bg-axiom-panel p-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-bold uppercase text-axiom-muted">Rug Scan</p>
@@ -117,6 +118,9 @@ export function AxiomProPanel({ mintAddress, context }: { mintAddress: string, c
           <p className="text-sm text-axiom-muted">Scan failed</p>
         )}
       </div>
+
+      {/* Realtime Volume Chart */}
+      <LiveVolumeChart mintAddress={mintAddress} />
       
       {/* Realtime Smart-Money */}
       <div className="rounded-sm border border-axiom-border bg-axiom-panel p-4">

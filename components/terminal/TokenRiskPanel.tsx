@@ -7,16 +7,25 @@ interface TokenRiskPanelProps {
 export function TokenRiskPanel({ intelligence }: TokenRiskPanelProps) {
   return (
     <div className="space-y-2">
-      <Metric label="Risk score" value={`${intelligence.risk.score}/100`} />
-      <Metric label="Holder risk" value={intelligence.holderRisk} />
-      <Metric label="Fresh wallets" value={intelligence.freshWalletActivity} />
-      <Metric label="Whales" value={intelligence.whaleActivity} />
-      <Metric label="Source" value={intelligence.source} />
-      {intelligence.priceUsd !== undefined ? (
-        <Metric label="Price" value={formatUsd(intelligence.priceUsd)} />
-      ) : null}
-      <p className="rounded-sm border border-axiom-border bg-axiom-bg p-2 text-xs leading-5 text-axiom-muted">
-        {intelligence.summary}
+      <Metric label="Risk score" value={`${intelligence.score || 0}/100`} />
+      
+
+
+      <Metric label="Fresh wallets" value={intelligence.details?.freshWalletActivity || "Unknown"} />
+      <Metric label="Whales" value={intelligence.details?.whaleActivity || "Unknown"} />
+      
+      {intelligence.details?.top10Concentration !== undefined && (
+         <Metric label="Top 10 Hold" value={`${intelligence.details.top10Concentration}%`} />
+      )}
+
+      <p className="rounded-sm border border-axiom-border bg-axiom-bg p-2 text-xs leading-5 text-axiom-muted mt-2">
+        {intelligence.warnings && intelligence.warnings.length > 0 ? (
+           <span className="text-red-400 font-bold block mb-1">Warnings:</span>
+        ) : null}
+        {intelligence.warnings?.map((w: string, i: number) => (
+          <span key={i} className="block mb-1">• {w}</span>
+        ))}
+        {(!intelligence.warnings || intelligence.warnings.length === 0) && "No critical warnings detected."}
       </p>
     </div>
   )

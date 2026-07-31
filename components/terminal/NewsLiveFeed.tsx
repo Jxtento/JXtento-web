@@ -64,7 +64,7 @@ export function NewsLiveFeed() {
       };
 
       ws.onerror = (err) => {
-        console.error("News Alerts WS error", err);
+        console.log("News Alerts WS error", err);
         ws?.close();
       };
     }

@@ -12,14 +12,60 @@ type GuardedPosition = {
 export function GuardedTab() {
   const [positions, setPositions] = useState<GuardedPosition[]>([]);
   const [loading, setLoading] = useState(false);
-  const [wallet, setWallet] = useState<string>("8G8q4gNwqb3CpsV4V9tL7kQd3Bw9o2nF2R5KzL3tN6a1"); // Mock connected wallet for now
+  const [wallet, setWallet] = useState<string>(""); 
   const [newMint, setNewMint] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
   
+  useEffect(() => {
+    // Attempt to connect phantom automatically
+    const connectWallet = async () => {
+      try {
+        const solana = (window as any).solana;
+        if (solana && solana.isPhantom) {
+          const resp = await solana.connect({ onlyIfTrusted: true });
+          if (resp.publicKey) {
+            setWallet(resp.publicKey.toString());
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Phantom auto-connect failed or not trusted yet");
+      }
+
+      // If Phantom is not connected, use or create an anonymous UUID for tracking
+      const storedAnon = localStorage.getItem('anonGuardWallet');
+      if (storedAnon) {
+        setWallet(storedAnon);
+      } else {
+        const newAnon = 'anon_' + Math.random().toString(36).substring(2, 11);
+        localStorage.setItem('anonGuardWallet', newAnon);
+        setWallet(newAnon);
+      }
+    };
+    connectWallet();
+  }, []);
+
   useEffect(() => {
     if (wallet) {
       fetchPositions();
     }
   }, [wallet]);
+
+  const showModal = (msg: string) => setModalMessage(msg);
+
+  const handleConnect = async () => {
+    const solana = (window as any).solana;
+    if (solana && solana.isPhantom) {
+      try {
+        const resp = await solana.connect();
+        setWallet(resp.publicKey.toString());
+      } catch (err) {
+        showModal("Failed to connect wallet.");
+      }
+    } else {
+      showModal("Phantom wallet not found!");
+    }
+  };
 
   const fetchPositions = async () => {
     if (!wallet) return;
@@ -38,7 +84,7 @@ export function GuardedTab() {
   };
 
   const toggleGuard = async (mint: string, enabled: boolean) => {
-    if (!wallet) return;
+    if (!wallet) return; // Wait for wallet or anon string
     try {
       const res = await fetch(`${API_URL}/v1/guard/toggle`, {
         method: 'POST',
@@ -49,21 +95,28 @@ export function GuardedTab() {
       if (data.success) {
         fetchPositions(); // refresh list
       } else {
-        alert(data.error || 'Failed to toggle guard');
+        showModal(data.error || 'Failed to toggle guard');
       }
     } catch (e) {
       console.error(e);
-      alert('Error toggling guard');
+      showModal('Error toggling guard');
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 text-axiom-text p-2">
+    <div className="flex flex-col gap-4 text-axiom-text p-2 relative">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-white">Exit Guard</h2>
-        <button onClick={fetchPositions} className="text-xs bg-axiom-panel border border-axiom-border hover:bg-axiom-border px-2 py-1 rounded text-white transition-colors">
-          Refresh
-        </button>
+        <div className="flex gap-2">
+          {wallet && wallet.startsWith("anon_") && (
+             <button onClick={handleConnect} className="text-xs bg-[#AB9FF2] hover:bg-[#9281f0] text-black px-2 py-1 rounded font-bold transition-colors">
+               Connect Wallet
+             </button>
+          )}
+          <button onClick={fetchPositions} className="text-xs bg-axiom-panel border border-axiom-border hover:bg-axiom-border px-2 py-1 rounded text-white transition-colors">
+            Refresh
+          </button>
+        </div>
       </div>
       
       <p className="text-xs text-axiom-muted">
@@ -113,6 +166,22 @@ export function GuardedTab() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Custom Modal Popup */}
+      {modalMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-axiom-panel border border-axiom-border rounded-xl p-6 max-w-sm w-full shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <h3 className="text-white font-bold text-lg mb-2">Notice</h3>
+            <p className="text-axiom-muted text-sm mb-6">{modalMessage}</p>
+            <button 
+              onClick={() => setModalMessage("")}
+              className="w-full bg-[#AB9FF2] hover:bg-[#9281f0] text-black font-bold py-2 px-4 rounded transition-colors"
+            >
+              OK
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -2,16 +2,20 @@ import { useEffect, useMemo, useState } from "react"
 
 export type AxiomTokenContext = any;
 export type ReputationResponse = any;
-async function auditDeveloperReputation(payload: any) {
+async function auditDeveloperReputation(payload: any, signal?: AbortSignal) {
   const backendUrl = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8080").replace(/\/+$/, "")
   try {
     const res = await fetch(`${backendUrl}/v1/reputation/developer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal
     })
     return res.ok ? await res.json() : null
-  } catch { return null }
+  } catch (err: any) { 
+    if (err.name === 'AbortError') return { aborted: true };
+    return null 
+  }
 }
 const getApiSettings = async () => ({ backendUrl: (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8080").replace(/\/+$/, "") });
 
@@ -50,6 +54,7 @@ export function DeveloperReputationPanel({
   }, [contextKey, context])
 
   useEffect(() => {
+    const abortController = new AbortController();
     const payload = {
       websiteUrl: context?.websiteUrl ?? "",
       githubRepoUrl: context?.githubRepoUrl ?? "",
@@ -59,7 +64,11 @@ export function DeveloperReputationPanel({
     }
     
     // Always run audit automatically on mount or when context changes
-    void runAudit(payload)
+    void runAudit(payload, abortController.signal)
+    
+    return () => {
+      abortController.abort(); // Prevent duplicate fetch in Strict Mode
+    }
   }, [contextKey, tokenAddress])
 
   useEffect(() => {
@@ -135,7 +144,7 @@ export function DeveloperReputationPanel({
     xPostUrl: string
     marketCap: string
     narrative: string
-  }) {
+  }, signal?: AbortSignal) {
     setLoading(true)
     setError("")
     const values = overrides ?? { websiteUrl, githubRepoUrl, xPostUrl, marketCap, narrative }
@@ -153,7 +162,9 @@ export function DeveloperReputationPanel({
       ...(nextMarketCap !== undefined ? { marketCapUsd: nextMarketCap } : {})
     }
 
-    const nextResult = await auditDeveloperReputation(payload)
+    const nextResult = await auditDeveloperReputation(payload, signal)
+
+    if (nextResult?.aborted) return; // Do nothing if aborted
 
     setLoading(false)
 

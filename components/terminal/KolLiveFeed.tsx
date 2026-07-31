@@ -64,7 +64,7 @@ export function KolLiveFeed() {
       };
 
       ws.onerror = (err) => {
-        console.error("KOL Alerts WS error", err);
+        console.log("KOL Alerts WS error", err);
         ws?.close();
       };
     }
