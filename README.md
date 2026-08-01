@@ -1,15 +1,7 @@
-# JXTENTO — Solana Trade Intelligence
+# JXTENTO Web — Solana Trade Intelligence Frontend
 
-JXTENTO maps every wallet, funding trail, and bundle on Solana in realtime. This repository contains the Next.js web application for the JXTENTO platform.
+JXTENTO maps every wallet, funding trail, and bundle on Solana in realtime. This repository contains the Next.js web application for the JXTENTO platform. It interacts closely with `jxtento-core` to visualize on-chain data.
 
-## Architecture & Tech Stack
-
-This project is built using modern frontend best practices:
-- **Framework**: [Next.js (App Router)](https://nextjs.org) for SSR, SEO, and optimal routing.
-- **Library**: [React 19](https://react.dev)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) for pixel-perfect, utility-first styling.
-- **Language**: [TypeScript](https://www.typescriptlang.org/) for strict type safety.
-- **Fonts**: `next/font/google` (DM Serif Display, IBM Plex Mono, Instrument Sans).
 
 ## Features
 
