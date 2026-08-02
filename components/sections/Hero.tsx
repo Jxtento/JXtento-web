@@ -23,6 +23,9 @@ export function Hero() {
           <div className="bg-[rgba(251,250,247,0.95)] backdrop-blur-sm relative z-10">
             <Button href="#map" variant="ghost" size="lg">How it reads the chain</Button>
           </div>
+          <div className="bg-[rgba(251,250,247,0.95)] backdrop-blur-sm relative z-10">
+            <Button href="/jxtento-extension.zip" variant="ghost" size="lg" download>Download Extension</Button>
+          </div>
         </div>
         <div className="grid grid-cols-3 border border-[var(--line)] bg-[rgba(251,250,247,0.95)] backdrop-blur-sm shadow-sm relative z-10">
           <div className="py-4 px-4 border-r border-[var(--line)]">
