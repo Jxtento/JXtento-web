@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { playNotificationSound } from "@/lib/sound";
 
 export function KolLiveFeed() {
   const [events, setEvents] = useState<any[]>([]);
@@ -44,6 +45,7 @@ export function KolLiveFeed() {
             if (evtData.category === "news") return;
             setEvents(prev => {
               if (prev.some(e => e.tweetId === evtData.tweetId)) return prev;
+              playNotificationSound();
               const newEvents = [evtData, ...prev];
               if (newEvents.length > 100) newEvents.length = 100;
               return newEvents;

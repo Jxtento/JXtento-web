@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { playNotificationSound } from "@/lib/sound"
 
 export function DevTrackerPanel({ mintAddress }: { mintAddress: string }) {
   const [forensic, setForensic] = useState<any>(null)
@@ -64,6 +65,7 @@ export function DevTrackerPanel({ mintAddress }: { mintAddress: string }) {
              return { ...prev, actors: newActors };
           })
         } else if (msg.type === "dev_sell" && msg.mint === mintAddress) {
+          playNotificationSound();
           setForensic((prev: any) => {
              if (!prev) return prev;
              return { ...prev, devSoldFraction: msg.devSoldFraction, devAlert: msg.alert };

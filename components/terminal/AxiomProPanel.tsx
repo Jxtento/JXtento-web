@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { playNotificationSound } from "@/lib/sound"
 import { DeveloperReputationPanel } from "./DeveloperReputationPanel"
 import { TokenRiskPanel } from "./TokenRiskPanel"
 export type TokenIntelligence = any;
@@ -70,6 +71,7 @@ export function AxiomProPanel({ mintAddress, context }: { mintAddress: string, c
           try {
             const msg = JSON.parse(event.data)
             if (msg.type === "smart_money" && msg.data.mint === mintAddress) {
+              playNotificationSound();
               setSmartMoneyEvents((prev) => [msg.data, ...prev].slice(0, 5)) // keep last 5 events
             }
           } catch (e) {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { playNotificationSound } from "@/lib/sound"
 
 export type AxiomTokenContext = any;
 export type ReputationResponse = any;
@@ -117,6 +118,9 @@ export function DeveloperReputationPanel({
               if ((prev?.state === "NOT POSTED" || prev?.state === "SCANNING...") && payload.data.state === "CA POSTED") {
                 setToastMessage("Dev just posted the CA!");
                 setTimeout(() => setToastMessage(""), 5000);
+              }
+              if ((prev?.state === "NOT POSTED" || prev?.state === "SCANNING...") && payload.data.state === "CA POSTED") {
+                playNotificationSound();
               }
               return { 
                 state: payload.data.state, 

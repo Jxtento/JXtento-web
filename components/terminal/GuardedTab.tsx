@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { playNotificationSound } from "@/lib/sound";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -93,6 +94,7 @@ export function GuardedTab() {
       });
       const data = await res.json();
       if (data.success) {
+        if (enabled) playNotificationSound();
         fetchPositions(); // refresh list
       } else {
         showModal(data.error || 'Failed to toggle guard');

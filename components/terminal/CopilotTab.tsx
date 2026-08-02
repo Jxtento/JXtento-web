@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { playNotificationSound } from "@/lib/sound";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -47,6 +48,7 @@ export function CopilotTab() {
       }
 
       const data = await response.json();
+      playNotificationSound();
       setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
     } catch (error) {
       console.error(error);

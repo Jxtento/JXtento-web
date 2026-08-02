@@ -32,7 +32,7 @@ export function AxiomProTab() {
   return (
     <div className="flex flex-col h-full overflow-y-auto p-4 gap-4">
       <div className="flex items-center justify-between pb-2 border-b border-axiom-border/10">
-        <h2 className="text-sm font-semibold text-axiom-text">Axiom Pro</h2>
+        <h2 className="text-sm font-semibold text-axiom-text">JXtento Pro</h2>
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-axiom-good animate-pulse shadow-[0_0_8px_rgba(11,122,59,0.6)]" />
           <span className="text-xs text-axiom-muted">Flow Radar Active</span>
@@ -46,7 +46,7 @@ export function AxiomProTab() {
           </svg>
           <h2 className="text-lg font-bold text-axiom-text">Inspect a Token</h2>
           <p className="mt-2 text-sm text-axiom-muted">
-            Use the manual inspector below to view Axiom Pro Intel.
+            Use the manual inspector below to view JXtento Pro Intel.
           </p>
         </div>
       ) : null}

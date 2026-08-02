@@ -64,7 +64,7 @@ export default function TerminalPage() {
               onClick={() => setActiveTab("axiom")}
               className={`whitespace-nowrap flex-shrink-0 text-sm font-bold pb-2 -mb-[1px] border-b-2 transition-colors ${activeTab === 'axiom' ? 'text-axiom-text border-axiom-text' : 'text-axiom-muted border-transparent hover:text-axiom-text/80'}`}
             >
-              Axiom Pro
+              JXtento Pro
             </button>
             <button 
               onClick={() => setActiveTab("activity")}

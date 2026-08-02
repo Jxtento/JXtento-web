@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { playNotificationSound } from "@/lib/sound";
 
 export type ActivityEntry = {
   id: string;
@@ -106,12 +107,24 @@ export function ActivityLog() {
     setLoading(false);
   }, []);
 
+  const previousCountRef = useRef(0);
+
   useEffect(() => {
     load();
     
     // Listen for storage changes in other tabs
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) load();
+      if (e.key === STORAGE_KEY) {
+        const currentCount = previousCountRef.current;
+        load();
+        setTimeout(() => {
+          const newData = getActivityLog();
+          if (newData.length > currentCount) {
+            playNotificationSound();
+          }
+          previousCountRef.current = newData.length;
+        }, 100);
+      }
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
