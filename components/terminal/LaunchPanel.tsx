@@ -37,7 +37,7 @@ export function LaunchPanel() {
       <h2 className="text-lg font-medium text-axiom-text mb-2">Fast Launch</h2>
       
       {loading ? (
-        <div className="text-axiom-muted text-sm mt-4 text-center">Checking $FDP balance...</div>
+        <div className="text-axiom-muted text-sm mt-4 text-center">Checking $JXTENTO balance...</div>
       ) : hasAccess(gateStatus?.tier || "none", "kolAlerts") ? (
         <FastLaunch />
       ) : (
@@ -47,8 +47,8 @@ export function LaunchPanel() {
           </svg>
           <h3 className="text-red-500 font-bold">Extension Locked</h3>
           <p className="text-[10px] text-axiom-muted">{gateStatus?.error || "You need at least Base Tier to unlock."}</p>
-          <p className="font-bold text-axiom-text bg-axiom-border/30 inline-block px-3 py-1 rounded text-xs mt-1">Required: 1M $FDP (Base Tier)</p>
-          <p className="text-xs text-axiom-muted">Current balance: {gateStatus?.balance.toLocaleString()} $FDP</p>
+          <p className="font-bold text-axiom-text bg-axiom-border/30 inline-block px-3 py-1 rounded text-xs mt-1">Hold 0.5% of supply to unlock</p>
+          <p className="text-xs text-axiom-muted">Current balance: {gateStatus?.balance.toLocaleString()} $JXTENTO</p>
         </div>
       )}
     </div>
