@@ -20,6 +20,8 @@ export function Navbar() {
             <Link 
               key={link.label} 
               href={link.href}
+              target={link.href.startsWith("http") ? "_blank" : undefined}
+              rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
               className="hidden max-[860px]:hidden min-[861px]:inline-block font-mono text-xs tracking-[.08em] text-[var(--muted)] transition-colors duration-[.18s] hover:text-[var(--ink)]"
             >
               {link.label}

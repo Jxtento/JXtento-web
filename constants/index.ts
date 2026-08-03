@@ -5,6 +5,7 @@ export const NAVIGATION_LINKS: NavigationLink[] = [
   { label: "Intel", href: "#features" },
   { label: "Read-only", href: "#trust" },
   { label: "$JXTENTO", href: "#token" },
+  { label: "X", href: "https://x.com/Jxtento6" },
 ];
 
 export const FOOTER_LINKS: NavigationLink[] = [
@@ -13,6 +14,7 @@ export const FOOTER_LINKS: NavigationLink[] = [
   { label: "Read-only", href: "#trust" },
   { label: "$JXTENTO", href: "#token" },
   { label: "Docs", href: "#" },
+  { label: "X (Twitter)", href: "https://x.com/Jxtento6" },
 ];
 
 export const FEATURES_DATA: FeatureItem[] = [
