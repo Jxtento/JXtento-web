@@ -67,7 +67,7 @@ async function uploadMetadata(draft: FastLaunchDraft, settings: LaunchSettings):
   if (draft.telegram) formData.append("telegram", draft.telegram);
   if (draft.website) formData.append("website", draft.website);
 
-  const res = await fetch("https://pump.fun/api/ipfs", {
+  const res = await fetch("/api/ipfs", {
     method: "POST",
     body: formData
   });
