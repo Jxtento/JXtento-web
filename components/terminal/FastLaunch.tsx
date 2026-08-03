@@ -113,10 +113,10 @@ const fastLaunch = async (draft: FastLaunchDraft, settings: LaunchSettings): Pro
         uri: metadataUri
       },
       mint: mintKeypair.publicKey.toBase58(),
-      denominatedInSol: true,
-      amount: Number(String(settings.devBuySol || 0).replace(',', '.')), // combining create + dev buy if pumpportal supports it (it does)
-      slippage: Number(String(settings.slippage || 5).replace(',', '.')),
-      priorityFee: Number(String(settings.priorityFee || 0.0005).replace(',', '.')),
+      denominatedInSol: "true",
+      amount: Number(String(settings.devBuySol || 0).replace(',', '.')) || 0,
+      slippage: Number(String(settings.slippage || 5).replace(',', '.')) || 5,
+      priorityFee: Number(String(settings.priorityFee || 0.0005).replace(',', '.')) || 0.0005,
       pool: "pump"
     };
 
