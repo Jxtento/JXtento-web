@@ -238,7 +238,21 @@ export function FastLaunch({ initialDraft }: { initialDraft?: Partial<FastLaunch
       });
     }
 
-    return () => {};
+    const handleFill = (e: Event) => {
+      const ce = e as CustomEvent;
+      const data = ce.detail;
+      setDraft(d => ({
+        ...d,
+        name: data.name || d.name,
+        symbol: data.symbol || d.symbol,
+        description: data.description || d.description,
+        image: data.image || d.image,
+        twitter: data.sourceUrl || data.twitter || d.twitter
+      }));
+    };
+
+    window.addEventListener('fillFastLaunch', handleFill);
+    return () => window.removeEventListener('fillFastLaunch', handleFill);
   }, [initialDraft]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

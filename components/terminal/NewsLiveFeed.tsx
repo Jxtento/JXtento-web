@@ -175,7 +175,16 @@ export function NewsLiveFeed() {
                 )}
                 <button
                   onClick={() => {
-                    alert('Launch Radar sync disabled in standalone web version.');
+                    window.dispatchEvent(new CustomEvent('fillFastLaunch', {
+                      detail: {
+                        name: evt.ticker || "",
+                        symbol: evt.ticker || "",
+                        description: evt.text,
+                        image: evt.mediaUrl ? evt.mediaUrl.split(',')[0] : "",
+                        sourceUrl: evt.url
+                      }
+                    }));
+                    window.dispatchEvent(new CustomEvent('switchTerminalTab', { detail: 'radar' }));
                   }}
                   className="ml-auto px-3 py-1 bg-black text-white border border-axiom-border text-xs font-semibold rounded hover:bg-black/80 transition-colors"
                 >

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { GuardedTab } from '@/components/terminal/GuardedTab';
@@ -14,6 +14,14 @@ import { AxiomProTab } from '@/components/terminal/AxiomProTab';
 export default function TerminalPage() {
   const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("radar");
 
+  useEffect(() => {
+    const handleSwitch = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setActiveTab(customEvent.detail);
+    };
+    window.addEventListener('switchTerminalTab', handleSwitch);
+    return () => window.removeEventListener('switchTerminalTab', handleSwitch);
+  }, []);
   return (
     <div className="flex flex-col h-screen w-full bg-[var(--paper)] text-[var(--ink)]">
       {/* Main Terminal Container */}
