@@ -114,13 +114,13 @@ const fastLaunch = async (draft: FastLaunchDraft, settings: LaunchSettings): Pro
       },
       mint: mintKeypair.publicKey.toBase58(),
       denominatedInSol: "true",
-      amount: Number(String(settings.devBuySol || 0).replace(',', '.')) || 0,
+      amount: 0, // MUST be 0 for trade-local create
       slippage: Number(String(settings.slippage || 5).replace(',', '.')) || 5,
       priorityFee: Number(String(settings.priorityFee || 0.0005).replace(',', '.')) || 0.0005,
       pool: "pump"
     };
 
-    console.log("[PumpPortal] Request Body:", JSON.stringify(reqBody, null, 2));
+    console.log("[PumpPortal] Create Request Body:", JSON.stringify(reqBody, null, 2));
 
     const response = await fetch("https://pumpportal.fun/api/trade-local", {
       method: "POST",
@@ -140,16 +140,61 @@ const fastLaunch = async (draft: FastLaunchDraft, settings: LaunchSettings): Pro
     }
 
     const txBytes = new Uint8Array(await response.arrayBuffer());
-    const tx = VersionedTransaction.deserialize(txBytes);
+    const txCreate = VersionedTransaction.deserialize(txBytes);
     
-    // 3. Sign with mint keypair
-    tx.sign([mintKeypair]);
+    // 3. Sign create tx with mint keypair (required by PumpPortal)
+    txCreate.sign([mintKeypair]);
     
-    // 4. Sign with Phantom wallet
-    const signedTx = await solana.signTransaction(tx);
+    let txsToSign = [txCreate];
+    let devBuyError = "";
+
+    // 4. If Dev Buy > 0, generate a separate Buy tx
+    const devBuySol = Number(String(settings.devBuySol || 0).replace(',', '.'));
+    if (devBuySol > 0) {
+      const buyReqBody = {
+        publicKey: publicKey.toBase58(),
+        action: "buy",
+        mint: mintKeypair.publicKey.toBase58(),
+        denominatedInSol: "true",
+        amount: devBuySol,
+        slippage: Number(String(settings.slippage || 5).replace(',', '.')) || 5,
+        priorityFee: Number(String(settings.priorityFee || 0.0005).replace(',', '.')) || 0.0005,
+        pool: "pump"
+      };
+
+      console.log("[PumpPortal] Dev Buy Request Body:", JSON.stringify(buyReqBody, null, 2));
+
+      const buyResponse = await fetch("https://pumpportal.fun/api/trade-local", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buyReqBody)
+      });
+
+      if (buyResponse.ok) {
+        const buyContentType = buyResponse.headers.get("content-type") || "";
+        if (!buyContentType.includes("application/json")) {
+          const buyTxBytes = new Uint8Array(await buyResponse.arrayBuffer());
+          const txBuy = VersionedTransaction.deserialize(buyTxBytes);
+          txsToSign.push(txBuy);
+        } else {
+          devBuyError = "Dev buy returned JSON error instead of transaction";
+        }
+      } else {
+        devBuyError = await buyResponse.text().catch(() => buyResponse.statusText);
+      }
+    }
     
-    // 5. Send transaction
-    const txid = await connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true });
+    // 5. Sign with Phantom wallet
+    const signedTxs = await solana.signAllTransactions(txsToSign);
+    
+    // 6. Send transactions
+    for (const signedTx of signedTxs) {
+      await connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true });
+    }
+    
+    if (devBuyError) {
+      return { success: true, mint: mintKeypair.publicKey.toBase58(), error: `Token created, but dev buy failed: ${devBuyError}` };
+    }
     
     return { success: true, mint: mintKeypair.publicKey.toBase58() };
   } catch (err: any) {
