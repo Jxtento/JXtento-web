@@ -134,6 +134,11 @@ export function KolLiveFeed() {
               <p className="text-xs text-axiom-text whitespace-pre-wrap mb-2">
                 {evt.text}
               </p>
+              {evt.mediaUrl && (
+                <div className="mb-2 rounded-lg overflow-hidden border border-jxtento-border/20">
+                  <img src={evt.mediaUrl} alt="Tweet Media" className="w-full h-auto object-cover max-h-[300px]" loading="lazy" />
+                </div>
+              )}
               
               <div className="flex items-center gap-2 mt-2 pt-2 border-t border-axiom-border/10">
                 {evt.ticker && (

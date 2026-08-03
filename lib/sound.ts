@@ -1,24 +1,31 @@
+let sharedAudioCtx: AudioContext | null = null;
+
 export const playNotificationSound = () => {
   try {
-    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+    if (!sharedAudioCtx) {
+      sharedAudioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    
+    // Attempt to resume if it was suspended due to autoplay policy
+    if (sharedAudioCtx.state === 'suspended') {
+      sharedAudioCtx.resume();
+    }
+
+    const oscillator = sharedAudioCtx.createOscillator();
+    const gainNode = sharedAudioCtx.createGain();
     
     oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    gainNode.connect(sharedAudioCtx.destination);
     
     oscillator.type = 'sine';
-    // Start at a high pitch (A5)
-    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
-    // Sweep up to a higher pitch (A6)
-    oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
+    oscillator.frequency.setValueAtTime(880, sharedAudioCtx.currentTime); 
+    oscillator.frequency.exponentialRampToValueAtTime(1760, sharedAudioCtx.currentTime + 0.1);
     
-    // Quick fade in and fade out
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    gainNode.gain.setValueAtTime(0.1, sharedAudioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, sharedAudioCtx.currentTime + 0.5);
     
-    oscillator.start(audioCtx.currentTime);
-    oscillator.stop(audioCtx.currentTime + 0.5);
+    oscillator.start(sharedAudioCtx.currentTime);
+    oscillator.stop(sharedAudioCtx.currentTime + 0.5);
   } catch(e) {
     console.error("Audio play failed", e);
   }

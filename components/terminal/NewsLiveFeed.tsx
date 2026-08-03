@@ -134,6 +134,11 @@ export function NewsLiveFeed() {
               <p className="text-xs text-axiom-text whitespace-pre-wrap mb-2">
                 {evt.text}
               </p>
+              {evt.mediaUrl && (
+                <div className="mb-2 rounded-lg overflow-hidden border border-jxtento-border/20">
+                  <img src={evt.mediaUrl} alt="Tweet Media" className="w-full h-auto object-cover max-h-[300px]" loading="lazy" />
+                </div>
+              )}
               
               {/* Narrative Tags */}
               <div className="flex flex-wrap gap-1 mt-2">
