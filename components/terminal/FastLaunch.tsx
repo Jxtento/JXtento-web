@@ -1,10 +1,86 @@
 import { useState, useEffect } from "react";
-import { Connection, SystemProgram, Transaction, PublicKey } from "@solana/web3.js";
+import { Connection, SystemProgram, Transaction, PublicKey, Keypair, VersionedTransaction } from "@solana/web3.js";
 
 export type FastLaunchDraft = { name: string; symbol: string; description: string; image: string; website?: string; telegram?: string; twitter?: string; };
 export type LaunchSettings = { ipfsProvider: string; pinataJwt: string; devBuySol: number | string; slippage: number | string; priorityFee: number | string; };
 
-const fastLaunch = async (draft: any, settings: any): Promise<{ success: boolean; error?: string; mint?: string }> => {
+async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
+  const response = await fetch(dataUrl);
+  return await response.blob();
+}
+
+async function uploadMetadata(draft: FastLaunchDraft, settings: LaunchSettings): Promise<string> {
+  if (settings.ipfsProvider === "pinata" && settings.pinataJwt) {
+    try {
+      const blob = await dataUrlToBlob(draft.image);
+      const formData = new FormData();
+      formData.append("file", blob, "image.png");
+      
+      const imgRes = await fetch("https://uploads.pinata.cloud/v3/files", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${settings.pinataJwt}` },
+        body: formData
+      });
+      
+      if (!imgRes.ok) throw new Error("Failed to upload image to Pinata");
+      const imgData = await imgRes.json();
+      const imageUri = `https://ipfs.io/ipfs/${imgData.data.cid}`;
+      
+      const metadata = {
+        name: draft.name,
+        symbol: draft.symbol,
+        description: draft.description,
+        image: imageUri,
+        showName: true,
+        ...(draft.twitter ? { twitter: draft.twitter } : {}),
+        ...(draft.telegram ? { telegram: draft.telegram } : {}),
+        ...(draft.website ? { website: draft.website } : {}),
+      };
+      
+      const metaBlob = new Blob([JSON.stringify(metadata)], { type: "application/json" });
+      const metaFormData = new FormData();
+      metaFormData.append("file", metaBlob, "metadata.json");
+      
+      const metaRes = await fetch("https://uploads.pinata.cloud/v3/files", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${settings.pinataJwt}` },
+        body: metaFormData
+      });
+      
+      if (!metaRes.ok) throw new Error("Failed to upload metadata to Pinata");
+      const metaData = await metaRes.json();
+      return `https://ipfs.io/ipfs/${metaData.data.cid}`;
+    } catch (err) {
+      console.warn("Pinata upload failed, falling back to pump.fun", err);
+    }
+  }
+
+  // Fallback to Pump.fun api
+  const blob = await dataUrlToBlob(draft.image);
+  const formData = new FormData();
+  formData.append("file", blob, "image.png");
+  formData.append("name", draft.name);
+  formData.append("symbol", draft.symbol);
+  formData.append("description", draft.description);
+  formData.append("showName", "true");
+  if (draft.twitter) formData.append("twitter", draft.twitter);
+  if (draft.telegram) formData.append("telegram", draft.telegram);
+  if (draft.website) formData.append("website", draft.website);
+
+  const res = await fetch("https://pump.fun/api/ipfs", {
+    method: "POST",
+    body: formData
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => res.statusText);
+    throw new Error(`Pump.fun IPFS upload failed: ${errText || res.statusText}`);
+  }
+  const data = await res.json();
+  return data.metadataUri;
+}
+
+const fastLaunch = async (draft: FastLaunchDraft, settings: LaunchSettings): Promise<{ success: boolean; error?: string; mint?: string }> => {
   try {
     const { solana } = window as any;
     if (!solana || !solana.isPhantom) {
@@ -15,33 +91,65 @@ const fastLaunch = async (draft: any, settings: any): Promise<{ success: boolean
     const publicKey = solana.publicKey;
     if (!publicKey) return { success: false, error: "Failed to connect to Phantom." };
 
-    // Helius RPC URL from frontend ENV or fallback
+    if (!draft.image || !draft.name || !draft.symbol) {
+      return { success: false, error: "Image, name, and symbol are required." };
+    }
+
     const rpcUrl = process.env.NEXT_PUBLIC_HELIUS_RPC_URL || "https://api.mainnet-beta.solana.com";
     const connection = new Connection(rpcUrl, "confirmed");
 
-    // In a real Pump.fun launch, we would build the CPI instructions for the Pump.fun program.
-    // For this implementation, we will simulate the transaction creation and request signature.
-    const tx = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: publicKey,
-        toPubkey: publicKey, // self-transfer simulation
-        lamports: 1000, 
-      })
-    );
+    // 1. Upload metadata
+    const metadataUri = await uploadMetadata(draft, settings);
 
-    const { blockhash } = await connection.getLatestBlockhash();
-    tx.recentBlockhash = blockhash;
-    tx.feePayer = publicKey;
+    // 2. Build Create Transaction via PumpPortal
+    const mintKeypair = Keypair.generate();
+    
+    const reqBody = {
+      publicKey: publicKey.toBase58(),
+      action: "create",
+      tokenMetadata: {
+        name: draft.name,
+        symbol: draft.symbol,
+        uri: metadataUri
+      },
+      mint: mintKeypair.publicKey.toBase58(),
+      denominatedInSol: true,
+      amount: Number(String(settings.devBuySol || 0).replace(',', '.')), // combining create + dev buy if pumpportal supports it (it does)
+      slippage: Number(String(settings.slippage || 5).replace(',', '.')),
+      priorityFee: Number(String(settings.priorityFee || 0.0005).replace(',', '.')),
+      pool: "pump"
+    };
 
+    const response = await fetch("https://pumpportal.fun/api/trade-local", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reqBody)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(`PumpPortal failed: ${errorText || response.statusText}`);
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`PumpPortal returned JSON error: ${errorData.error || errorData.message || JSON.stringify(errorData)}`);
+    }
+
+    const txBytes = new Uint8Array(await response.arrayBuffer());
+    const tx = VersionedTransaction.deserialize(txBytes);
+    
+    // 3. Sign with mint keypair
+    tx.sign([mintKeypair]);
+    
+    // 4. Sign with Phantom wallet
     const signedTx = await solana.signTransaction(tx);
     
-    // Simulate sending to Helius RPC
+    // 5. Send transaction
     const txid = await connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true });
     
-    // Mocking the mint address since pump.fun program isn't fully invoked here
-    const mockMint = PublicKey.unique().toBase58();
-
-    return { success: true, mint: mockMint };
+    return { success: true, mint: mintKeypair.publicKey.toBase58() };
   } catch (err: any) {
     return { success: false, error: err.message || "Launch failed" };
   }
