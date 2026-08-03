@@ -12,7 +12,7 @@ import { LaunchRadarTab } from '@/components/terminal/LaunchRadarTab';
 import { AxiomProTab } from '@/components/terminal/AxiomProTab';
 
 export default function TerminalPage() {
-  const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("kol");
+  const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("radar");
 
   return (
     <div className="flex flex-col h-screen w-full bg-[var(--paper)] text-[var(--ink)]">
