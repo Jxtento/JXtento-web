@@ -120,6 +120,8 @@ const fastLaunch = async (draft: FastLaunchDraft, settings: LaunchSettings): Pro
       pool: "pump"
     };
 
+    console.log("[PumpPortal] Request Body:", JSON.stringify(reqBody, null, 2));
+
     const response = await fetch("https://pumpportal.fun/api/trade-local", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
