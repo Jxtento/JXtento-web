@@ -17,22 +17,29 @@ import { AxiomProTab } from '@/components/terminal/AxiomProTab';
 export default function TerminalPage() {
   const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("radar");
   const { connected, publicKey, wallet } = useWallet();
-  const prevConnected = useRef<boolean | null>(null);
+  const registeredWallet = useRef<string | null>(null);
 
   // Register wallet in database automatically when connected
   useEffect(() => {
-    if (connected && publicKey && !prevConnected.current) {
-      // Wallet just connected (or was connected on initial load)
-      fetch('/api/user/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: publicKey.toBase58(),
-          provider: wallet?.adapter.name || 'Unknown',
-        }),
-      }).catch(() => {/* silent fail */});
+    if (connected && publicKey) {
+      const address = publicKey.toBase58();
+      // Only register if we haven't registered THIS wallet in the current session
+      if (registeredWallet.current !== address) {
+        registeredWallet.current = address;
+        
+        fetch('/api/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            walletAddress: address,
+            provider: wallet?.adapter.name || 'Unknown',
+          }),
+        }).catch(() => {/* silent fail */});
+      }
+    } else if (!connected) {
+      // Reset when disconnected
+      registeredWallet.current = null;
     }
-    prevConnected.current = connected;
   }, [connected, publicKey, wallet]);
 
 

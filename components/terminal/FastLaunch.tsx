@@ -231,7 +231,25 @@ export function FastLaunch({ initialDraft }: { initialDraft?: Partial<FastLaunch
 
   useEffect(() => {
     getLaunchSettings().then(setSettings);
-    if (!initialDraft) {
+    
+    // Check if there is a pending launch passed via sessionStorage (from KOL/News feed)
+    const pendingDataStr = sessionStorage.getItem('pendingFastLaunch');
+    if (pendingDataStr) {
+      try {
+        const data = JSON.parse(pendingDataStr);
+        setDraft(d => ({
+          ...d,
+          name: data.name || d.name,
+          symbol: data.symbol || d.symbol,
+          description: data.description || d.description,
+          image: data.image || d.image,
+          twitter: data.sourceUrl || data.twitter || d.twitter
+        }));
+        sessionStorage.removeItem('pendingFastLaunch');
+      } catch (e) {
+        console.error("Failed to parse pending FastLaunch data", e);
+      }
+    } else if (!initialDraft) {
       getSelectedLaunchContext().then(ctx => {
         if (ctx) {
           const generatedDraft = createLaunchDraft(ctx);

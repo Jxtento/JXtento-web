@@ -175,15 +175,16 @@ export function NewsLiveFeed() {
                 )}
                 <button
                   onClick={() => {
-                    window.dispatchEvent(new CustomEvent('fillFastLaunch', {
-                      detail: {
-                        name: evt.ticker || "",
-                        symbol: evt.ticker || "",
-                        description: evt.text,
-                        image: evt.mediaUrl ? evt.mediaUrl.split(',')[0] : "",
-                        sourceUrl: evt.url
-                      }
-                    }));
+                    const draftData = {
+                      name: evt.ticker || "",
+                      symbol: evt.ticker || "",
+                      description: evt.text,
+                      image: evt.mediaUrl ? evt.mediaUrl.split(',')[0] : "",
+                      sourceUrl: evt.url
+                    };
+                    sessionStorage.setItem('pendingFastLaunch', JSON.stringify(draftData));
+                    
+                    window.dispatchEvent(new CustomEvent('fillFastLaunch', { detail: draftData }));
                     window.dispatchEvent(new CustomEvent('switchTerminalTab', { detail: 'radar' }));
                   }}
                   className="ml-auto px-3 py-1 bg-black text-white border border-axiom-border text-xs font-semibold rounded hover:bg-black/80 transition-colors"
