@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, SystemProgram, Transaction, PublicKey, Keypair, VersionedTransaction } from "@solana/web3.js";
 
 export type FastLaunchDraft = { name: string; symbol: string; description: string; image: string; website?: string; telegram?: string; twitter?: string; };
@@ -208,6 +209,7 @@ const getSelectedLaunchContext = async () => null;
 const createLaunchDraft = (ctx: any) => ({ tokenName: "", ticker: "", description: "", sourceUrl: "" });
 
 export function FastLaunch({ initialDraft }: { initialDraft?: Partial<FastLaunchDraft> } = {}) {
+  const { publicKey, wallet } = useWallet();
   const [draft, setDraft] = useState<FastLaunchDraft>({
     name: initialDraft?.name || "",
     symbol: initialDraft?.symbol || "",
@@ -282,6 +284,50 @@ export function FastLaunch({ initialDraft }: { initialDraft?: Partial<FastLaunch
     const res = await fastLaunch(draft, settings);
     if (res.success && res.mint) {
       setSuccessLink(`https://pump.fun/${res.mint}`);
+      // Save to activity log
+      try {
+        const STORAGE_KEY = "jxtento_activity_log";
+        const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        const devBuySolNum = parseFloat(String(settings.devBuySol)) || 0;
+        const entries: any[] = [
+          {
+            id: `deploy_${Date.now()}`,
+            type: "token_deployed",
+            timestamp: Date.now(),
+            publicKey: publicKey?.toBase58(),
+            mintAddress: res.mint,
+            ticker: draft.symbol,
+            name: draft.name,
+          },
+        ];
+        if (devBuySolNum > 0) {
+          entries.push({
+            id: `devbuy_${Date.now()}`,
+            type: "dev_buy",
+            timestamp: Date.now(),
+            mintAddress: res.mint,
+            devBuySol: devBuySolNum,
+          });
+        }
+        const updated = [...entries, ...existing].slice(0, 200);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
+
+      // Also save to database (fire-and-forget)
+      if (publicKey) {
+        fetch('/api/launch-history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mintAddress: res.mint,
+            ticker: draft.symbol,
+            name: draft.name,
+            deployerAddress: publicKey.toBase58(),
+            txHash: res.mint, // txHash not available from pumpportal response; use mint as fallback
+          }),
+        }).catch(() => {/* silent */});
+      }
+
       // If token was created but dev buy failed, show as warning
       if (res.error) {
         setError(`⚠️ ${res.error}`);

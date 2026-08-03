@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -16,7 +16,28 @@ import { AxiomProTab } from '@/components/terminal/AxiomProTab';
 
 export default function TerminalPage() {
   const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("radar");
-  const { connected } = useWallet();
+  const { connected, publicKey, wallet } = useWallet();
+  const prevConnected = useRef<boolean | null>(null);
+
+  // Register wallet in database on first connect
+  useEffect(() => {
+    if (prevConnected.current === null) {
+      prevConnected.current = connected;
+      return;
+    }
+    if (connected && !prevConnected.current && publicKey) {
+      fetch('/api/user/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: publicKey.toBase58(),
+          provider: wallet?.adapter.name || 'Unknown',
+        }),
+      }).catch(() => {/* silent fail */});
+    }
+    prevConnected.current = connected;
+  }, [connected, publicKey, wallet]);
+
 
   useEffect(() => {
     const handleSwitch = (e: Event) => {
