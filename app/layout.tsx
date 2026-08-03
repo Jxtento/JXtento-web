@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   description: "JXTENTO maps every wallet, funding trail, and bundle on Solana in realtime.",
 };
 
+import { Providers } from "./providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,7 +41,9 @@ export default function RootLayout({
         className="min-h-full flex flex-col font-sans bg-[var(--paper)] text-[var(--ink)] antialiased overflow-x-hidden"
         suppressHydrationWarning
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
