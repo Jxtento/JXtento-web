@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import { GuardedTab } from '@/components/terminal/GuardedTab';
 import { CopilotTab } from '@/components/terminal/CopilotTab';
@@ -16,7 +16,7 @@ import { AxiomProTab } from '@/components/terminal/AxiomProTab';
 
 export default function TerminalPage() {
   const [activeTab, setActiveTab] = useState<"radar" | "kol" | "news" | "axiom" | "activity" | "guarded" | "copilot">("radar");
-  const { isConnected } = useAccount();
+  const { connected } = useWallet();
 
   useEffect(() => {
     const handleSwitch = (e: Event) => {
@@ -45,7 +45,7 @@ export default function TerminalPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <ConnectButton />
+              <WalletMultiButton style={{ fontSize: '12px', height: '34px', padding: '0 12px', borderRadius: '6px', background: '#0b7a3b' }} />
               <Link 
                 href="/" 
                 className="px-3 py-1.5 text-xs font-semibold rounded bg-axiom-bg border border-axiom-border text-axiom-muted hover:text-axiom-text hover:border-axiom-text transition-colors flex items-center gap-1.5"
@@ -56,14 +56,14 @@ export default function TerminalPage() {
             </div>
           </div>
 
-          {!isConnected ? (
+          {!connected ? (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
               <span className="text-6xl mb-4 block">🔒</span>
               <h2 className="text-2xl font-bold text-axiom-text mb-2">Wallet Required</h2>
               <p className="text-sm text-axiom-muted max-w-md mb-6">
                 Please connect your wallet using the button in the top right corner to access the JXtento Pro Terminal features.
               </p>
-              <ConnectButton />
+              <WalletMultiButton style={{ fontSize: '14px', height: '44px', padding: '0 20px', borderRadius: '8px', background: '#0b7a3b' }} />
             </div>
           ) : (
             <>
