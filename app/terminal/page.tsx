@@ -19,13 +19,10 @@ export default function TerminalPage() {
   const { connected, publicKey, wallet } = useWallet();
   const prevConnected = useRef<boolean | null>(null);
 
-  // Register wallet in database on first connect
+  // Register wallet in database automatically when connected
   useEffect(() => {
-    if (prevConnected.current === null) {
-      prevConnected.current = connected;
-      return;
-    }
-    if (connected && !prevConnected.current && publicKey) {
+    if (connected && publicKey && !prevConnected.current) {
+      // Wallet just connected (or was connected on initial load)
       fetch('/api/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
