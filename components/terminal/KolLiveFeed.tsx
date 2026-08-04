@@ -157,9 +157,13 @@ export function KolLiveFeed() {
                 )}
                 <button
                   onClick={() => {
+                    const foundTicker = evt.ticker || (evt.text.match(/\$([A-Za-z0-9]+)/)?.[1]?.toUpperCase()) || "";
+                    const fallbackName = foundTicker || (evt.authorHandle ? `${evt.authorHandle} Coin` : "New Token");
+                    const fallbackSymbol = foundTicker || (evt.authorHandle ? evt.authorHandle.substring(0,4).toUpperCase() : "TOKEN");
+                    
                     const draftData = {
-                      name: evt.ticker || "",
-                      symbol: evt.ticker || "",
+                      name: fallbackName,
+                      symbol: fallbackSymbol,
                       description: evt.text,
                       image: evt.mediaUrl ? evt.mediaUrl.split(',')[0] : "",
                       sourceUrl: evt.url

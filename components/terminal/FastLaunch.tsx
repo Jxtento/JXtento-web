@@ -216,7 +216,6 @@ export function FastLaunch({ initialDraft }: { initialDraft?: Partial<FastLaunch
     description: initialDraft?.description || "",
     image: initialDraft?.image || ""
   });
-  
   const [settings, setSettings] = useState<LaunchSettings>({
     ipfsProvider: "pumpfun",
     pinataJwt: "",
@@ -249,7 +248,7 @@ export function FastLaunch({ initialDraft }: { initialDraft?: Partial<FastLaunch
       } catch (e) {
         console.error("Failed to parse pending FastLaunch data", e);
       }
-    } else if (!initialDraft) {
+    } else if (!initialDraft && !draft.name) {
       getSelectedLaunchContext().then(ctx => {
         if (ctx) {
           const generatedDraft = createLaunchDraft(ctx);
