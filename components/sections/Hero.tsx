@@ -33,7 +33,9 @@ export function Hero() {
           JXTENTO maps every wallet, funding trail, and bundle on Solana in realtime. Trace where the money came from before you enter. Pure intelligence, zero execution.
         </p>
         <div className="flex gap-[14px] flex-wrap mb-[40px]">
-          <Button href="#" size="lg">Launch terminal</Button>
+          <div className="relative z-10">
+            <Button href="/terminal" size="lg">Launch terminal</Button>
+          </div>
           <div className="bg-[rgba(251,250,247,0.95)] backdrop-blur-sm relative z-10">
             <Button href="#map" variant="ghost" size="lg">How it reads the chain</Button>
           </div>
