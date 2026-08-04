@@ -1,5 +1,7 @@
 # JXTENTO Web — Solana Trade Intelligence Frontend
 
+**Official JXtento Contract Address:** `6wAnrbNZU6jMtrxjBZGUD2Sre1n1ZCo8b1atNjy1pump`
+
 JXTENTO maps every wallet, funding trail, and bundle on Solana in realtime. This repository contains the Next.js web application for the JXTENTO platform. It interacts closely with `jxtento-core` to visualize on-chain data.
 
 
